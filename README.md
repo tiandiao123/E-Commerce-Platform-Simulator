@@ -1,3 +1,8 @@
+Project Tutor: Peter
+Project Author and Constructor:Cuiqing Li
+Update Time:3/23/2017
+
+### Here is information about some details:
 # elasticDB node setup
 1. set master and slaves in set_env.sh
 2. make sure you have installed mysql 5.5 on all the nodes in the queues. 
