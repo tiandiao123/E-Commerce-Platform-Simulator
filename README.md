@@ -1,6 +1,6 @@
 Project Tutor: Peter
 
-Project Author and Constructor:Cuiqing Li
+Project Member:Cuiqing Li
 
 Update Time:3/23/2017
 
