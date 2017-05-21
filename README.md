@@ -4,7 +4,10 @@ Project Member:Cuiqing Li
 
 Update Time:3/23/2017
 
-### Here is information about some details:
+### Description of the project:
+This is a project which is used to simulate a large scale E-Commerce. Also, I am going to use Java to implement this project based on based on TPCW benchmark and classical multi-tier architecture. The platform has following properties: Client Emulator, Distributed Database System, back-end monitor system, read in and write out controlling system. More details will be filled in later on! 
+
+### Here is information about some details of how to set up environments for the project:
 # elasticDB node setup
 1. set master and slaves in set_env.sh
 2. make sure you have installed mysql 5.5 on all the nodes in the queues. 
