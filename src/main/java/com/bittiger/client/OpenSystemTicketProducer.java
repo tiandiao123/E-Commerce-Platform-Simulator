@@ -3,9 +3,6 @@ package com.bittiger.client;
 import java.util.concurrent.BlockingQueue;
 import java.util.Random;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class OpenSystemTicketProducer extends Thread {
 	private TPCWProperties tpcw = null;
 	public long startTime;
@@ -15,12 +12,9 @@ public class OpenSystemTicketProducer extends Thread {
 	private final BlockingQueue<Integer> queue;
 	private Random rand;
 	private double[] rate;
-	private static transient final Logger LOG = LoggerFactory
-			.getLogger(OpenSystemTicketProducer.class);
 
 	public OpenSystemTicketProducer(ClientEmulator ce, BlockingQueue<Integer> bQueue) {
 		this.tpcw = ce.getTpcw();
-		this.startTime = ce.getStartTime();
 		this.warmup = tpcw.warmup;
 		this.mi = tpcw.mi;
 		this.warmdown = tpcw.warmdown;
@@ -31,7 +25,6 @@ public class OpenSystemTicketProducer extends Thread {
 
 	public void run() {
 		int num = 0;
-		LOG.info("OpenSystemTicketProducer is running.");
 		while (true) {
 			long currTime = System.currentTimeMillis();
 			if (currTime - startTime < (warmup + mi + warmdown)) {
@@ -39,7 +32,6 @@ public class OpenSystemTicketProducer extends Thread {
 				int rlIndex = (int) (Math.floor((double) (currTime - startTime)
 						/ tpcw.interval));
 				double sendrate = 0 - rate[rlIndex];
-				LOG.debug("OpenSystemTicketProducer send rate: " + sendrate);
 				long wait = ((long) (sendrate * Math.log(r)));
 				try {
 					Thread.sleep(wait);
