@@ -1,6 +1,10 @@
 package com.bittiger.client;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 
@@ -25,13 +29,13 @@ public class TPCWProperties {
 	public double write[];
 
 	// Information about server
-	public String writeQueue[];
+	public String writeQueue;
 	public String readQueue[];
 	public String candidateQueue[];
 
 	public String username;
 	public String password;
-	
+
 	public int destroyerSleepInterval;
 	public String destroyTarget;
 
@@ -55,10 +59,7 @@ public class TPCWProperties {
 
 	public void checkPropertiesFileAndGetURLGenerator() {
 		try {
-			username = getProperty("username");
-			password = getProperty("password");
-			destroyerSleepInterval = Integer.parseInt(getProperty("destroyerSleepInterval"));
-			destroyTarget = getProperty("destroyTarget");
+
 			mixRate = Double.parseDouble(getProperty("mixRate"));
 			TPCmean = Double.parseDouble(getProperty("TPCmean"));
 			warmup = Long.parseLong(getProperty("warmup"));
@@ -74,7 +75,7 @@ public class TPCWProperties {
 				rate[rlCnt] = Double.parseDouble(rl.nextToken().trim());
 				rlCnt++;
 			}
-//			LOG.info("rate is " + Arrays.toString(rate));
+			// LOG.info("rate is " + Arrays.toString(rate));
 
 			StringTokenizer wl = new StringTokenizer(
 					getProperty("workload_vector"), ",");
@@ -85,7 +86,7 @@ public class TPCWProperties {
 				wlCnt++;
 			}
 			LOG.info("workloads is " + Arrays.toString(workloads));
-			
+
 			if (workloads.length * interval != warmup + warmdown + mi) {
 				LOG.error("workload length can not match warm up/down + mi");
 				Runtime.getRuntime().exit(0);
@@ -111,35 +112,11 @@ public class TPCWProperties {
 			}
 			LOG.info("write is " + Arrays.toString(write));
 
-			rl = new StringTokenizer(getProperty("readQueue"), ",");
-			readQueue = new String[rl.countTokens()];
-			rlCnt = 0;
-			while (rl.hasMoreTokens()) {
-				readQueue[rlCnt] = rl.nextToken().trim();
-				rlCnt++;
-			}
-			LOG.info("readQueue is " + Arrays.toString(readQueue));
+			loadPropertyFromSetEnv();
 
-			
-			rl = new StringTokenizer(getProperty("writeQueue"), ",");
-			writeQueue = new String[rl.countTokens()];
-			rlCnt = 0;
-			while (rl.hasMoreTokens()) {
-				writeQueue[rlCnt] = rl.nextToken().trim();
-				rlCnt++;
-			}
-			LOG.info("writeQueue is " + Arrays.toString(writeQueue));
-
-			rl = new StringTokenizer(getProperty("candidateQueue"), ",");
-			candidateQueue = new String[rl.countTokens()];
-			rlCnt = 0;
-			while (rl.hasMoreTokens()) {
-				candidateQueue[rlCnt] = rl.nextToken().trim();
-				rlCnt++;
-			}
-			LOG.info("candidateQueue is " + Arrays.toString(candidateQueue));
-
-
+			destroyerSleepInterval = Integer
+					.parseInt(getProperty("destroyerSleepInterval"));
+			LOG.info("destroyerSleepInterval is " + destroyerSleepInterval);
 		} catch (Exception e) {
 			System.err.println("Error while checking properties: "
 					+ e.getMessage());
@@ -153,6 +130,69 @@ public class TPCWProperties {
 
 	public static void setConfiguration(ResourceBundle configuration) {
 		TPCWProperties.configuration = configuration;
+	}
+
+	private void loadPropertyFromSetEnv() throws IOException {
+		Properties prop = new Properties();
+		InputStream input = null;
+		try {
+			input = new FileInputStream("scripts/set_env.sh");
+			// load a properties file
+			prop.load(input);
+
+			// #!/bin/bash
+			//
+			// set -o allexport
+			//
+			// MYSQL_USERNAME='root'
+			// MYSQL_PASSWORD='TigerBit!2016'
+			//
+			// # HOSTS
+			// #MASTER=35.162.86.105
+			// #SLAVE=(54.204.168.204 35.161.215.21)
+			// #CANDIDATE=(35.164.142.220)
+			//
+			// set +o allexport
+			// get the property value and print it out
+			username = prop.getProperty("MYSQL_USERNAME").replaceAll("\'", "");
+			password = prop.getProperty("MYSQL_PASSWORD").replaceAll("\'", "");
+			LOG.info("MySQL usr/pass is " + username + "," + password);
+
+			writeQueue = processServer(prop.getProperty("MASTER"))[0];
+			LOG.info("writeQueue is " + writeQueue);
+			String[] slaves = processServer(prop.getProperty("SLAVE"));
+			readQueue = new String[1 + slaves.length];
+			readQueue[0] = writeQueue;
+			for (int i = 0; i < slaves.length; i++) {
+				readQueue[i + 1] = slaves[i];
+			}
+			LOG.info("readQueue is " + Arrays.toString(readQueue));
+			
+			candidateQueue = processServer(prop.getProperty("CANDIDATE"));
+			LOG.info("candidateQueue is " + Arrays.toString(candidateQueue));
+
+			destroyTarget = slaves[0];
+			LOG.info("destroyTarget is " + destroyTarget);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+			throw ex;
+		} finally {
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private String[] processServer(String servers) {
+		if (servers.startsWith("(")) {
+			// get rid of ()
+			servers = servers.substring(1, servers.length() - 1);
+		}
+		return servers.split(" ");
 	}
 
 }

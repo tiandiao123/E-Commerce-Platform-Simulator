@@ -41,7 +41,7 @@ public class Monitor {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			con = DriverManager.getConnection(
-					Utilities.getStatsUrl(c.getTpcw().writeQueue[0]),
+					Utilities.getStatsUrl(c.getTpcw().writeQueue),
 					c.getTpcw().username, c.getTpcw().password);
 			con.setAutoCommit(true);
 			try {
@@ -49,7 +49,7 @@ public class Monitor {
 				CleanStatsQuery clean = new CleanStatsQuery();
 				stmt.executeUpdate(clean.getQueryStr());
 				stmt.close();
-				LOG.info("Clean stats at server " + c.getTpcw().writeQueue[0]);
+				LOG.info("Clean stats at server " + c.getTpcw().writeQueue);
 			} catch (Exception e) {
 				LOG.error(e.toString());
 			}

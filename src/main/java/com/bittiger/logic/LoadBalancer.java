@@ -22,7 +22,7 @@ public class LoadBalancer {
 
 	public LoadBalancer(ClientEmulator ce) {
 		this.c = ce;
-		writeQueue = new Server(ce.getTpcw().writeQueue[0]);
+		writeQueue = new Server(ce.getTpcw().writeQueue);
 		for (int i = 0; i < ce.getTpcw().readQueue.length; i++) {
 			readQueue.add(new Server(ce.getTpcw().readQueue[i]));
 		}
@@ -37,8 +37,8 @@ public class LoadBalancer {
 	}
 
 	public synchronized Server getNextReadServer() {
-		Server server = readQueue.get(nextReadServer);
 		nextReadServer = (nextReadServer + 1) % readQueue.size();
+		Server server = readQueue.get(nextReadServer);
 		LOG.debug("choose read server as " + server.getIp());
 		return server;
 	}

@@ -20,8 +20,8 @@ TPCW_HOME="$( cd "$TPCW_HOME" && pwd )"
 
 echo "TPCW_HOME is set to $TPCW_HOME"
 
-# Check scp from local to all servers
-echo "*** Check scp from local to all servers *********************************"
+# Check ssh from local to all servers
+echo "*** Check ssh from local to all servers *********************************"
 for i in $MASTER ${SLAVE[@]} ${CANDIDATE[@]}
 do
 echo "check local to $i"
@@ -39,19 +39,19 @@ scp -r $TPCW_HOME root@$i:$HOME
 done
 
 
-# Check scp to all servers
-echo "*** checking scp to all servers *********************************"
+# Check ssh to all servers
+echo "*** checking ssh to all servers *********************************"
 
 for i in $MASTER ${SLAVE[@]} ${CANDIDATE[@]}
 do
 for j in $MASTER ${SLAVE[@]} ${CANDIDATE[@]} 
 do
 echo "$i at $j"
-ssh -o StrictHostKeyChecking=no -o BatchMode=yes root@$i "ssh root@$j "hostname""
+ssh -o StrictHostKeyChecking=no -o BatchMode=yes root@$i "ssh -o StrictHostKeyChecking=no -o BatchMode=yes root@$j "hostname""
 done
 done
 
-# Check scp to all servers
+# Check mysql conf to all servers
 echo "*** change my.cnf to open to everywhere *********************************"
 for i in $MASTER ${SLAVE[@]} ${CANDIDATE[@]}
 do
