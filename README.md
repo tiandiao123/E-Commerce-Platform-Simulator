@@ -7,8 +7,8 @@ Update Time:3/23/2017
 ### Description of the project:
 This is a project which is used to simulate a large scale E-Commerce. Also, I am going to use Java to implement this project based on based on TPCW benchmark and classical multi-tier architecture. The platform has following properties: Client Emulator, Distributed Database System, back-end monitor system, read in and write out controlling system. More details will be filled in later on! 
 
-Here is the general view of view:
-![png]()
+Here is the general view:
+![png](Capture.png)
 
 ### Software Installation:
 ## elasticDB node setup
