@@ -36,7 +36,7 @@ Here is the general view of the front-end, and the structure design referenced f
 * Or, from eclipse, in order to test availability and scalability run with -c -d
 * Or, you can also run from CommandLine accordingly
 
-## elasticDB monitor (lesson 4)
+## elasticDB monitor
 * run ./enableMonitors.sh, this will run dstats and open windows for MASTER, SLAVE and CANDIDATE
 * open your browser to point to monitorIp:8080/WebContent/elasticdb.jsp
 
